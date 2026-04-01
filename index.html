@@ -1057,9 +1057,9 @@
   <div class="share-section">
     <div class="section-label" style="text-align:center; margin-bottom:16px;">✦ 초대장 공유하기 ✦</div>
     <div class="share-buttons">
-      <button class="share-btn kakao" onclick="shareKakao()">
-        <span class="btn-icon">💬</span>
-        <span>공유하기</span>
+      <button class="share-btn kakao" onclick="shareSms()">
+        <span class="btn-icon">✉️</span>
+        <span>문자 공유</span>
       </button>
       <button class="share-btn link" onclick="copyLink()">
         <span class="btn-icon">🔗</span>
@@ -1094,26 +1094,6 @@
   <div class="lightbox-dots" id="lbDots"></div>
 </div>
 
-<!-- 공유 바텀 시트 -->
-<div class="share-modal" id="shareModal">
-  <div class="share-modal-backdrop" onclick="closeShareModal()"></div>
-  <div class="share-modal-sheet">
-    <div class="share-modal-title">초대장 공유하기</div>
-    <div class="share-modal-grid">
-      <button class="share-modal-btn" onclick="shareToKakao()">
-        <span class="smi">💬</span>
-        <span>카카오톡으로 공유</span>
-      </button>
-      <button class="share-modal-btn" onclick="shareSms()">
-        <span class="smi">✉️</span>문자 보내기
-      </button>
-      <button class="share-modal-btn" onclick="copyLink(); closeShareModal();">
-        <span class="smi">🔗</span>링크 복사
-      </button>
-    </div>
-    <button class="share-modal-cancel" onclick="closeShareModal()">닫기</button>
-  </div>
-</div>
 
 <!-- BGM -->
 <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
@@ -1132,37 +1112,36 @@
   =================================================== */
   const ADDR      = '전북특별자치도 임실군 오수면 둔덕1길 14-20';
   const PLACE     = '둔덕교회';
-  const LAT       = 35.7269;
-  const LNG       = 127.2647;
   const ADDR_ENC  = encodeURIComponent(ADDR);
   const PLACE_ENC = encodeURIComponent(PLACE);
+  const FULL_ENC  = encodeURIComponent(ADDR + ', ' + PLACE);
 
   function openNaverMapLink(e) {
     e.preventDefault();
-    const deep = `nmap://search?query=${ADDR_ENC}&appname=com.dunduk.church`;
-    const web  = `https://map.naver.com/v5/search/${ADDR_ENC}`;
+    const deep = `nmap://search?query=${FULL_ENC}&appname=com.dunduk.church`;
+    const web  = `https://map.naver.com/v5/search/${FULL_ENC}`;
     window.location.href = deep;
     setTimeout(() => window.open(web, '_blank'), 1200);
   }
 
   function openTmap() {
-    // 티맵: 목적지 주소로 길찾기
-    const deep = `tmap://route?goalname=${PLACE_ENC}&goalx=${LNG}&goaly=${LAT}`;
-    const web  = `https://tmap.life/map/routeplan?goalname=${PLACE_ENC}&goalx=${LNG}&goaly=${LAT}`;
+    // 티맵: 주소 기반 목적지 설정
+    const deep = `tmap://route?goalname=${PLACE_ENC}&goaladdr=${ADDR_ENC}`;
+    const web  = `https://tmap.life/search?keyword=${FULL_ENC}`;
     tryDeepLink(deep, web);
   }
 
   function openKakaoNavi() {
-    // 카카오내비: 목적지 좌표로 길찾기 (주소 검색보다 정확)
-    const deep = `kakaomap://route?ep=${LAT},${LNG}&by=CAR`;
-    const web  = `https://map.kakao.com/link/to/${PLACE_ENC},${LAT},${LNG}`;
+    // 카카오맵: 주소 검색으로 목적지 찾기
+    const deep = `kakaomap://search?q=${FULL_ENC}`;
+    const web  = `https://map.kakao.com/link/search/${encodeURIComponent(ADDR + ', ' + PLACE)}`;
     tryDeepLink(deep, web);
   }
 
   function openNaverMap() {
-    // 네이버지도: 목적지 좌표 + 이름으로 길찾기
-    const deep = `nmap://navigation?dlat=${LAT}&dlng=${LNG}&dname=${PLACE_ENC}&appname=com.dunduk.church`;
-    const web  = `https://map.naver.com/v5/directions//-/${PLACE_ENC},${LNG},${LAT}/car`;
+    // 네이버지도: 주소 기반 목적지 검색
+    const deep = `nmap://search?query=${FULL_ENC}&appname=com.dunduk.church`;
+    const web  = `https://map.naver.com/v5/search/${FULL_ENC}`;
     tryDeepLink(deep, web);
   }
 
