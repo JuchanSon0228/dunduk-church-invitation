@@ -672,6 +672,11 @@
       color: #3C1E1E;
     }
 
+    .share-btn.sms {
+      background: #D6EEFF;
+      color: #1a5fa8;
+    }
+
     .share-btn.link {
       background: #f5f0ea;
       color: #3D2B1F;
@@ -1059,10 +1064,17 @@
     <div class="section-label" style="text-align:center; margin-bottom:16px;">✦ 초대장 공유하기 ✦</div>
     <div class="share-buttons">
       <button class="share-btn kakao" onclick="shareToKakao()">
-        <span class="btn-icon">💬</span>
+        <span class="btn-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 1.5C5.75 1.5 1.5 5.4 1.5 10.2c0 3 1.72 5.65 4.36 7.3l-.85 3.3 3.4-1.68c.83.18 1.7.28 2.59.28 5.25 0 9.5-3.9 9.5-8.7S16.25 1.5 11 1.5z" fill="#3C1E1E"/>
+            <circle cx="8.5" cy="10.2" r="1.2" fill="#FEE500"/>
+            <circle cx="13.5" cy="10.2" r="1.2" fill="#FEE500"/>
+            <path d="M8.5 12.8 Q11 15 13.5 12.8" stroke="#FEE500" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+          </svg>
+        </span>
         <span>카카오 공유</span>
       </button>
-      <button class="share-btn link" onclick="shareSms()">
+      <button class="share-btn sms" onclick="shareSms()">
         <span class="btn-icon">✉️</span>
         <span>문자 공유</span>
       </button>
@@ -1131,8 +1143,7 @@
     e.preventDefault();
     const deep = `nmap://search?query=${FULL_ENC}&appname=com.dunduk.church`;
     const web  = `https://map.naver.com/v5/search/${FULL_ENC}`;
-    window.location.href = deep;
-    setTimeout(() => window.open(web, '_blank'), 1200);
+    tryDeepLink(deep, web);
   }
 
   function openTmap() {
@@ -1157,10 +1168,19 @@
   }
 
   function tryDeepLink(deeplink, webFallback) {
-    // 앱 실행 시도
-    window.location.href = deeplink;
-    // 앱 미설치 시 웹으로 대체
-    setTimeout(() => {
+    // 숨은 앵커로 딥링크 시도 → window.location 변경 없어 뒤로가기 정상 작동
+    const a = document.createElement('a');
+    a.href = deeplink;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // 앱이 열리면 페이지가 백그라운드로 이동 → visibilitychange로 감지
+    let timer;
+    const onHide = () => { clearTimeout(timer); document.removeEventListener('visibilitychange', onHide); };
+    document.addEventListener('visibilitychange', onHide);
+    timer = setTimeout(() => {
+      document.removeEventListener('visibilitychange', onHide);
       window.open(webFallback, '_blank');
     }, 1500);
   }
