@@ -603,6 +603,41 @@
       -webkit-user-drag: none;
       user-drag: none;
     }
+
+    /* ===== BGM 토글 버튼 ===== */
+    .bgm-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(139, 111, 71, 0.92);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+      z-index: 8000;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .bgm-btn:active {
+      transform: scale(0.9);
+    }
+
+    /* 재생 중일 때 회전 애니메이션 */
+    .bgm-btn.playing .bgm-icon {
+      display: inline-block;
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -704,13 +739,15 @@
       </div>
     </div>
 
-    <!-- 카카오 지도 임베드 -->
+    <!-- 네이버 지도 임베드 -->
     <div class="map-container">
       <iframe
-        src="https://map.kakao.com/link/map/둔덕교회,35.7269,127.2647/embed"
+        src="https://maps.google.com/maps?q=35.7269,127.2647&output=embed&hl=ko"
         style="border:none; width:100%; height:100%;"
         title="둔덕교회 위치"
         loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
       ></iframe>
     </div>
 
@@ -812,6 +849,14 @@
 
   <div class="lightbox-dots" id="lbDots"></div>
 </div>
+
+<!-- BGM -->
+<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+
+<!-- BGM 토글 버튼 -->
+<button class="bgm-btn" id="bgmBtn" onclick="toggleBgm()" title="BGM 켜기/끄기">
+  <span class="bgm-icon">🎵</span>
+</button>
 
 <!-- 토스트 메시지 -->
 <div class="toast" id="toast"></div>
@@ -985,6 +1030,44 @@
   document.addEventListener('contextmenu', e => {
     if (e.target.tagName === 'IMG') e.preventDefault();
   });
+
+  /* ===================================================
+     BGM 자동재생 + 토글
+     - 모바일 브라우저는 사용자 첫 터치 이후에만 오디오 재생 허용
+     - 첫 터치 시 자동 시작, 이후 버튼으로 on/off
+  =================================================== */
+  const bgm    = document.getElementById('bgm');
+  const bgmBtn = document.getElementById('bgmBtn');
+  let bgmStarted = false;
+
+  function startBgm() {
+    if (bgmStarted) return;
+    bgmStarted = true;
+    bgm.volume = 0.5;
+    bgm.play().then(() => {
+      bgmBtn.classList.add('playing');
+    }).catch(() => {
+      // 재생 실패 시 조용히 무시
+    });
+  }
+
+  function toggleBgm() {
+    if (!bgmStarted) {
+      startBgm();
+      return;
+    }
+    if (bgm.paused) {
+      bgm.play();
+      bgmBtn.classList.add('playing');
+    } else {
+      bgm.pause();
+      bgmBtn.classList.remove('playing');
+    }
+  }
+
+  // 첫 터치/클릭 시 BGM 자동 시작
+  document.addEventListener('click',     startBgm, { once: true });
+  document.addEventListener('touchstart', startBgm, { once: true, passive: true });
 </script>
 
 </body>
