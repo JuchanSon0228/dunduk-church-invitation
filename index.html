@@ -1179,9 +1179,8 @@
   tryPlay();
 
   // 2) 실패 시 첫 터치에서 재생 (iOS Safari 등)
-  //    touchstart: 화면에 손가락 닿는 순간 → 스크롤 불필요
+  //    touchstart 만 사용 - click 리스너는 공유 등 다른 기능의 사용자 제스처 권한을 빼앗을 수 있음
   document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
-  document.addEventListener('click',      tryPlay, { once: true });
 </script>
 
 </body>
