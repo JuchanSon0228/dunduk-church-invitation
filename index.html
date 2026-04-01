@@ -1309,7 +1309,10 @@
     lb.addEventListener('touchend', e => {
       if (isPinching) {
         isPinching = false;
-        if (lbScale < 1.1) window._resetLbZoom();
+        // 손을 떼면 항상 원래 크기로 부드럽게 복귀
+        img.style.transition = 'transform 0.25s ease';
+        window._resetLbZoom();
+        setTimeout(() => { img.style.transition = ''; }, 260);
         return;
       }
       if (isPanning) { isPanning = false; return; }
