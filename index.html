@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta property="og:title" content="둔덕교회 VIP 초청주일" />
+  <meta property="og:description" content="세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일에 초대합니다" />
+  <title>둔덕교회 VIP 초청주일 초대장</title>
+
+  <!-- 카카오 SDK -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
+    integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
+    crossorigin="anonymous"></script>
+
+  <style>
+    /* ===== 기본 초기화 ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background-color: #f5f0ea;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* ===== 전체 컨테이너 ===== */
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      background-color: #fff;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* ===== 상단 날짜 배지 ===== */
+    .top-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+
+    .top-badge .month {
+      font-size: 10px;
+      color: #8B6F47;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .top-badge .day {
+      font-size: 22px;
+      color: #5B3A29;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    /* ===== 히어로 이미지 영역 ===== */
+    .hero {
+      width: 100%;
+      position: relative;
+      background: linear-gradient(135deg, #f9f3ec 0%, #ede0d0 50%, #d4b896 100%);
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .hero-placeholder {
+      text-align: center;
+      padding: 60px 30px;
+    }
+
+    .hero-cross {
+      font-size: 48px;
+      color: #8B6F47;
+      margin-bottom: 20px;
+      opacity: 0.7;
+    }
+
+    .hero-title-text {
+      font-size: 13px;
+      letter-spacing: 4px;
+      color: #8B6F47;
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .hero-main-title {
+      font-size: 26px;
+      color: #3D2B1F;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .hero-date {
+      margin-top: 24px;
+      font-size: 16px;
+      color: #8B6F47;
+      font-weight: 500;
+      letter-spacing: 2px;
+    }
+
+    /* ===== 초대 메시지 섹션 ===== */
+    .invite-section {
+      padding: 50px 32px 40px;
+      text-align: center;
+      border-bottom: 1px solid #f0e8df;
+    }
+
+    .invite-subtitle {
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: #8B6F47;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .invite-main {
+      font-size: 19px;
+      color: #2C1A0E;
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .invite-main span {
+      color: #8B6F47;
+    }
+
+    .invite-body {
+      font-size: 14px;
+      color: #555;
+      line-height: 2.2;
+      text-align: center;
+      word-break: keep-all;
+    }
+
+    .invite-body p {
+      margin-bottom: 20px;
+    }
+
+    .invite-sign {
+      margin-top: 30px;
+      font-size: 13px;
+      color: #8B6F47;
+      font-weight: 600;
+    }
+
+    /* ===== 구분선 장식 ===== */
+    .divider {
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      margin: 8px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: #e0d5c8;
+    }
+
+    .divider-icon {
+      font-size: 14px;
+      color: #C9A87C;
+      margin: 0 12px;
+    }
+
+    /* ===== 행사 정보 섹션 ===== */
+    .event-section {
+      padding: 40px 32px;
+      text-align: center;
+      border-bottom: 1px solid #f0e8df;
+    }
+
+    .section-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: #8B6F47;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .event-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .event-info-item {
+      background: #faf6f0;
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+    }
+
+    .event-info-item .info-icon {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .event-info-item .info-label {
+      font-size: 10px;
+      color: #8B6F47;
+      letter-spacing: 2px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .event-info-item .info-value {
+      font-size: 14px;
+      color: #2C1A0E;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .event-info-item .info-value.time {
+      font-size: 18px;
+    }
+
+    /* ===== 위치 섹션 ===== */
+    .location-section {
+      padding: 40px 32px;
+      border-bottom: 1px solid #f0e8df;
+    }
+
+    .location-address {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .location-address .address-main {
+      font-size: 15px;
+      color: #2C1A0E;
+      font-weight: 600;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .location-address .address-phone {
+      font-size: 14px;
+      color: #8B6F47;
+    }
+
+    .location-address .address-phone a {
+      color: #8B6F47;
+      text-decoration: none;
+    }
+
+    /* 지도 영역 */
+    .map-container {
+      width: 100%;
+      height: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      background: #e8e0d5;
+      position: relative;
+    }
+
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* 내비게이션 버튼들 */
+    .nav-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .nav-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 8px;
+      border-radius: 12px;
+      border: 1.5px solid #e0d5c8;
+      background: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      gap: 6px;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.96);
+      background: #faf6f0;
+    }
+
+    .nav-btn-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .nav-btn span {
+      font-size: 11px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    /* ===== 사진 갤러리 섹션 ===== */
+    .gallery-section {
+      padding: 40px 0;
+      border-bottom: 1px solid #f0e8df;
+    }
+
+    .gallery-section .section-label {
+      text-align: center;
+      margin-bottom: 20px;
+      padding: 0 32px;
+    }
+
+    /* 가로 스크롤 썸네일 목록 */
+    .gallery-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: scroll;
+      overflow-y: visible;
+      width: 100%;
+      padding: 4px 24px 12px;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      scrollbar-width: none;
+      will-change: scroll-position;
+    }
+
+    .gallery-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gallery-thumb {
+      flex: 0 0 160px;
+      height: 160px;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      scroll-snap-align: start;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transition: transform 0.2s;
+    }
+
+    .gallery-thumb:active {
+      transform: scale(0.96);
+    }
+
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* 썸네일 인덱스 배지 */
+    .gallery-thumb .thumb-index {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      pointer-events: none;
+    }
+
+    /* 총 사진 수 표시 */
+    .gallery-count {
+      text-align: center;
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 6px;
+      padding: 0 32px;
+    }
+
+    /* ===== 라이트박스 (전체화면 사진 뷰어) ===== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.93);
+      z-index: 10000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+
+    .lightbox-counter {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .lightbox-img-wrap {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 70px 16px 80px;
+    }
+
+    .lightbox-img-wrap img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* 이전/다음 버튼 */
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .lightbox-nav:active {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .lightbox-nav.prev { left: 16px; }
+    .lightbox-nav.next { right: 16px; }
+
+    /* 하단 도트 인디케이터 */
+    .lightbox-dots {
+      position: absolute;
+      bottom: 28px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .lightbox-dots .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .lightbox-dots .dot.active {
+      background: #fff;
+      transform: scale(1.3);
+    }
+
+    /* ===== 공유 섹션 ===== */
+    .share-section {
+      padding: 32px;
+      border-bottom: 1px solid #f0e8df;
+    }
+
+    .share-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .share-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .share-btn:active {
+      transform: scale(0.96);
+    }
+
+    .share-btn.kakao {
+      background: #FEE500;
+      color: #3C1E1E;
+    }
+
+    .share-btn.link {
+      background: #f5f0ea;
+      color: #3D2B1F;
+      border: 1.5px solid #e0d5c8;
+    }
+
+    .share-btn .btn-icon {
+      font-size: 18px;
+    }
+
+    /* ===== 푸터 ===== */
+    .footer {
+      padding: 30px 32px 50px;
+      text-align: center;
+    }
+
+    .footer-church {
+      font-size: 16px;
+      font-weight: 700;
+      color: #3D2B1F;
+      margin-bottom: 6px;
+    }
+
+    .footer-info {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.8;
+    }
+
+    /* ===== 토스트 메시지 ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 이미지 우클릭/드래그 방지 */
+    img {
+      -webkit-user-drag: none;
+      user-drag: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ===== 히어로 영역 ===== -->
+  <div class="hero">
+    <div class="top-badge">
+      <span class="month">APR</span>
+      <span class="day">19</span>
+    </div>
+    <div class="hero-placeholder">
+      <div class="hero-cross">✝</div>
+      <div class="hero-title-text">INVITATION</div>
+      <div class="hero-main-title">
+        세상에서 가장 소중한<br/>당신을 초대합니다
+      </div>
+      <div class="hero-date">2026. 04. 19 (일)</div>
+    </div>
+  </div>
+
+  <!-- ===== 초대 메시지 ===== -->
+  <div class="invite-section">
+    <div class="invite-subtitle">VIP INVITATION</div>
+    <div class="invite-main">
+      세상에서 가장 소중한 당신을,<br/>
+      <span>둔덕교회 VIP 초청주일</span>에<br/>
+      초대합니다
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-icon">✦</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="invite-body">
+      <p>
+        어느 나라에 태어나느냐에 따라 조국이 결정되고,<br/>
+        어떤 부모를 만나느냐에 따라 가문이 결정되고,<br/>
+        어떤 배우자를 만나느냐에 따라 가정이 결정되고,
+      </p>
+      <p>
+        어떤 종교, 참신(하나님)을 만나느냐에 따라<br/>
+        영원이 결정됩니다.
+      </p>
+      <p>
+        예수님과의 만남은<br/>
+        세상이 줄 수 없는 구원과<br/>
+        행복한 인생이 되게 합니다.
+      </p>
+    </div>
+
+    <div class="invite-sign">
+      둔덕교회 담임목사 외 교우일동
+    </div>
+  </div>
+
+  <!-- ===== 행사 정보 ===== -->
+  <div class="event-section">
+    <div class="section-label">✦ 행사 정보 ✦</div>
+    <div class="event-info-grid">
+      <div class="event-info-item">
+        <div class="info-icon">📅</div>
+        <div class="info-label">DATE</div>
+        <div class="info-value">2026년<br/>4월 19일 (일)</div>
+      </div>
+      <div class="event-info-item">
+        <div class="info-icon">⏰</div>
+        <div class="info-label">TIME</div>
+        <div class="info-value time">오전 11시</div>
+      </div>
+      <div class="event-info-item">
+        <div class="info-icon">⛪</div>
+        <div class="info-label">PLACE</div>
+        <div class="info-value">둔덕교회<br/>본당</div>
+      </div>
+      <div class="event-info-item">
+        <div class="info-icon">📞</div>
+        <div class="info-label">CONTACT</div>
+        <div class="info-value">
+          <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 위치 정보 ===== -->
+  <div class="location-section">
+    <div class="section-label" style="text-align:center;">✦ 오시는 길 ✦</div>
+
+    <div class="location-address">
+      <div class="address-main">
+        전북특별자치도 임실군<br/>오수면 둔덕1길 14-20
+      </div>
+      <div class="address-phone">
+        <a href="tel:01036251282">📞 010-3625-1282</a>
+      </div>
+    </div>
+
+    <!-- 카카오 지도 임베드 -->
+    <div class="map-container">
+      <iframe
+        src="https://map.kakao.com/link/map/둔덕교회,35.7269,127.2647/embed"
+        style="border:none; width:100%; height:100%;"
+        title="둔덕교회 위치"
+        loading="lazy"
+      ></iframe>
+    </div>
+
+    <!-- 내비게이션 버튼 (주소 기반) -->
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="openTmap()">
+        <div class="nav-btn-icon">🗺️</div>
+        <span>티맵</span>
+      </button>
+      <button class="nav-btn" onclick="openKakaoNavi()">
+        <div class="nav-btn-icon">🚗</div>
+        <span>카카오내비</span>
+      </button>
+      <button class="nav-btn" onclick="openNaverMap()">
+        <div class="nav-btn-icon">📍</div>
+        <span>네이버지도</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 사진 갤러리 ===== -->
+  <div class="gallery-section">
+    <div class="section-label">✦ 교회 사진 ✦</div>
+
+    <div class="gallery-scroll" id="galleryScroll">
+      <div class="gallery-thumb" onclick="openLightbox(0)">
+        <img src="둔덕교회_1_수정.png" alt="둔덕교회 사진 1" loading="lazy" />
+        <div class="thumb-index">1 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(1)">
+        <img src="둔덕교회_3.jpeg" alt="둔덕교회 사진 2" loading="lazy" />
+        <div class="thumb-index">2 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(2)">
+        <img src="둔덕교회_4.jpeg" alt="둔덕교회 사진 3" loading="lazy" />
+        <div class="thumb-index">3 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(3)">
+        <img src="둔덕교회_5.jpeg" alt="둔덕교회 사진 4" loading="lazy" />
+        <div class="thumb-index">4 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(4)">
+        <img src="둔덕교회_6.jpeg" alt="둔덕교회 사진 5" loading="lazy" />
+        <div class="thumb-index">5 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(5)">
+        <img src="둔덕교회_7.jpeg" alt="둔덕교회 사진 6" loading="lazy" />
+        <div class="thumb-index">6 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(6)">
+        <img src="둔덕교회_8.jpeg" alt="둔덕교회 사진 7" loading="lazy" />
+        <div class="thumb-index">7 / 8</div>
+      </div>
+      <div class="gallery-thumb" onclick="openLightbox(7)">
+        <img src="둔덕교회_9.jpeg" alt="둔덕교회 사진 8" loading="lazy" />
+        <div class="thumb-index">8 / 8</div>
+      </div>
+    </div>
+    <div class="gallery-count">← 옆으로 스크롤해서 더 보기 · 사진을 누르면 크게 볼 수 있어요</div>
+  </div>
+
+  <!-- ===== 공유 ===== -->
+  <div class="share-section">
+    <div class="section-label" style="text-align:center; margin-bottom:16px;">✦ 초대장 공유하기 ✦</div>
+    <div class="share-buttons">
+      <button class="share-btn kakao" onclick="shareKakao()">
+        <span class="btn-icon">💬</span>
+        <span>카카오톡 공유</span>
+      </button>
+      <button class="share-btn link" onclick="copyLink()">
+        <span class="btn-icon">🔗</span>
+        <span>링크 복사</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== 푸터 ===== -->
+  <div class="footer">
+    <div class="footer-church">둔덕교회</div>
+    <div class="footer-info">
+      전북특별자치도 임실군 오수면 둔덕1길 14-20<br/>
+      010-3625-1282
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ===== 라이트박스 (전체화면 뷰어) ===== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div class="lightbox-counter" id="lbCounter">1 / 8</div>
+
+  <div class="lightbox-img-wrap">
+    <img id="lbImage" src="" alt="교회 사진" />
+  </div>
+
+  <button class="lightbox-nav prev" onclick="moveLightbox(-1)">‹</button>
+  <button class="lightbox-nav next" onclick="moveLightbox(1)">›</button>
+
+  <div class="lightbox-dots" id="lbDots"></div>
+</div>
+
+<!-- 토스트 메시지 -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ===================================================
+     내비게이션 앱 열기 (주소 기반)
+  =================================================== */
+  const ADDR      = '전북특별자치도 임실군 오수면 둔덕1길 14-20';
+  const PLACE     = '둔덕교회';
+  const LAT       = 35.7269;
+  const LNG       = 127.2647;
+  const ADDR_ENC  = encodeURIComponent(ADDR);
+  const PLACE_ENC = encodeURIComponent(PLACE);
+
+  function openTmap() {
+    // 티맵: 목적지 주소로 길찾기
+    const deep = `tmap://route?goalname=${PLACE_ENC}&goalx=${LNG}&goaly=${LAT}`;
+    const web  = `https://tmap.life/map/routeplan?goalname=${PLACE_ENC}&goalx=${LNG}&goaly=${LAT}`;
+    tryDeepLink(deep, web);
+  }
+
+  function openKakaoNavi() {
+    // 카카오내비: 목적지 좌표로 길찾기 (주소 검색보다 정확)
+    const deep = `kakaomap://route?ep=${LAT},${LNG}&by=CAR`;
+    const web  = `https://map.kakao.com/link/to/${PLACE_ENC},${LAT},${LNG}`;
+    tryDeepLink(deep, web);
+  }
+
+  function openNaverMap() {
+    // 네이버지도: 목적지 좌표 + 이름으로 길찾기
+    const deep = `nmap://navigation?dlat=${LAT}&dlng=${LNG}&dname=${PLACE_ENC}&appname=com.dunduk.church`;
+    const web  = `https://map.naver.com/v5/directions//-/${PLACE_ENC},${LNG},${LAT}/car`;
+    tryDeepLink(deep, web);
+  }
+
+  function tryDeepLink(deeplink, webFallback) {
+    // 앱 실행 시도
+    window.location.href = deeplink;
+    // 앱 미설치 시 웹으로 대체
+    setTimeout(() => {
+      window.open(webFallback, '_blank');
+    }, 1500);
+  }
+
+  /* ===================================================
+     사진 갤러리 / 라이트박스
+  =================================================== */
+  const IMAGES = [
+    '둔덕교회_1_수정.png',
+    '둔덕교회_3.jpeg',
+    '둔덕교회_4.jpeg',
+    '둔덕교회_5.jpeg',
+    '둔덕교회_6.jpeg',
+    '둔덕교회_7.jpeg',
+    '둔덕교회_8.jpeg',
+    '둔덕교회_9.jpeg',
+  ];
+
+  let currentIdx = 0;
+
+  // 라이트박스 열기
+  function openLightbox(idx) {
+    currentIdx = idx;
+    const lb = document.getElementById('lightbox');
+    lb.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    renderLightbox();
+    buildDots();
+  }
+
+  // 라이트박스 닫기
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // 이전/다음 이동
+  function moveLightbox(dir) {
+    currentIdx = (currentIdx + dir + IMAGES.length) % IMAGES.length;
+    renderLightbox();
+  }
+
+  // 이미지 및 카운터 업데이트
+  function renderLightbox() {
+    document.getElementById('lbImage').src = IMAGES[currentIdx];
+    document.getElementById('lbCounter').textContent = `${currentIdx + 1} / ${IMAGES.length}`;
+    // 도트 업데이트
+    const dots = document.querySelectorAll('.lightbox-dots .dot');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIdx);
+    });
+  }
+
+  // 하단 도트 생성
+  function buildDots() {
+    const container = document.getElementById('lbDots');
+    container.innerHTML = '';
+    IMAGES.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === currentIdx ? ' active' : '');
+      dot.onclick = () => { currentIdx = i; renderLightbox(); };
+      container.appendChild(dot);
+    });
+  }
+
+  // 스와이프로 이미지 넘기기
+  (function initSwipe() {
+    const lb = document.getElementById('lightbox');
+    let startX = 0;
+    lb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) moveLightbox(diff > 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+
+  // ESC 키로 닫기
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft')  moveLightbox(-1);
+    if (e.key === 'ArrowRight') moveLightbox(1);
+  });
+
+  /* ===================================================
+     공유 기능
+  =================================================== */
+  // Kakao.init('YOUR_KAKAO_APP_KEY'); // ← 카카오 앱 키 입력
+
+  function shareKakao() {
+    if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
+      copyLink(); return;
+    }
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '둔덕교회 VIP 초청주일',
+        description: '세상에서 가장 소중한 당신을 초대합니다 — 2025년 4월 19일',
+        link: { mobileWebUrl: location.href, webUrl: location.href },
+      },
+      buttons: [{ title: '초대장 보기', link: { mobileWebUrl: location.href, webUrl: location.href } }],
+    });
+  }
+
+  async function copyLink() {
+    const url = location.href;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast('링크가 복사되었습니다! 📋');
+    } catch { showToast('링크 복사에 실패했습니다.'); }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // 이미지 우클릭 방지
+  document.addEventListener('contextmenu', e => {
+    if (e.target.tagName === 'IMG') e.preventDefault();
+  });
+</script>
+
+</body>
+</html>
