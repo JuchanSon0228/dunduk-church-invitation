@@ -264,8 +264,9 @@
     }
 
     .event-info-item .info-icon {
-      font-size: 22px;
+      font-size: 36px;
       margin-bottom: 8px;
+      line-height: 1;
     }
 
     /* 날짜 미니 캘린더 */
@@ -275,23 +276,23 @@
       border: 2px solid #8B6F47;
       border-radius: 8px;
       overflow: hidden;
-      width: 42px;
+      width: 48px;
       text-align: center;
       margin-bottom: 8px;
     }
     .cal-icon .cal-top {
       background: #8B6F47;
       color: #fff;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
-      padding: 3px 0;
+      padding: 4px 0;
       letter-spacing: 1px;
     }
     .cal-icon .cal-day {
       color: #2C1A0E;
-      font-size: 19px;
+      font-size: 22px;
       font-weight: 800;
-      padding: 2px 0;
+      padding: 3px 0;
       line-height: 1.2;
       background: #fff;
     }
@@ -305,14 +306,10 @@
     }
 
     .event-info-item .info-value {
-      font-size: 16px;
+      font-size: 21px;
       color: #2C1A0E;
       font-weight: 700;
       line-height: 1.4;
-    }
-
-    .event-info-item .info-value.time {
-      font-size: 21px;
     }
 
     /* ===== 위치 섹션 ===== */
@@ -918,7 +915,7 @@
       <div class="event-info-item">
         <div class="info-icon">⏰</div>
         <div class="info-label">TIME</div>
-        <div class="info-value time">오전 11시</div>
+        <div class="info-value">오전 11시</div>
       </div>
       <div class="event-info-item">
         <div class="info-icon">⛪</div>
@@ -1066,9 +1063,9 @@
   <div class="share-modal-sheet">
     <div class="share-modal-title">초대장 공유하기</div>
     <div class="share-modal-grid">
-      <button class="share-modal-btn" onclick="shareViaApps()">
-        <span class="smi">📤</span>
-        <span>앱으로 공유<br/><small style="font-weight:400;color:#888;">(카카오톡·인스타 등)</small></span>
+      <button class="share-modal-btn" onclick="shareToKakao()">
+        <span class="smi">💬</span>
+        <span>카카오톡으로 공유</span>
       </button>
       <button class="share-modal-btn" onclick="shareSms()">
         <span class="smi">✉️</span>문자 보내기
@@ -1232,39 +1229,51 @@
   const SHARE_URL  = location.href;
   const SHARE_DATA = { title: '둔덕교회 VIP 초청주일', text: SHARE_TEXT, url: SHARE_URL };
 
-  // 메인 공유 버튼 → 항상 바텀 시트 열기 (명시적 선택 제공)
+  // 메인 공유 버튼 → 바텀 시트 열기
   function shareKakao() { openShareModal(); }
 
   // 바텀 시트 열기 / 닫기
   function openShareModal()  { document.getElementById('shareModal').classList.add('open'); }
   function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
 
-  // ① 카카오톡 / 앱 목록 공유
-  //    navigator.share() = 시스템 공유 시트 = 기기에 설치된 모든 앱 표시
-  //    여기서 KakaoTalk 선택 → KakaoTalk 채팅 목록(피커) 자동 오픈
-  async function shareViaApps() {
-    // 모달을 먼저 닫지 않고 share() 호출 → 사용자 제스처 컨텍스트 유지
-    if (navigator.share) {
-      try {
-        await navigator.share(SHARE_DATA);
+  // ① 카카오톡으로 공유 (iOS · Android 모두 채팅 목록 열기)
+  function shareToKakao() {
+    const text = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // 앱 전환 감지: 페이지가 hidden 되면 앱이 열린 것
+    let appOpened = false;
+    document.addEventListener('visibilitychange', function handler() {
+      if (document.hidden) appOpened = true;
+      document.removeEventListener('visibilitychange', handler);
+    }, { once: true });
+
+    if (isIOS) {
+      // iOS: kakaotalk://send?text= → 카카오톡 친구/채팅 선택 화면
+      window.location.href = `kakaotalk://send?text=${text}`;
+    } else {
+      // Android: Intent URL → 카카오톡 채팅 목록
+      window.location.href =
+        `intent://send?text=${text}#Intent;scheme=kakaotalk;package=com.kakao.talk;end`;
+    }
+
+    // 1.5초 후에도 앱이 안 열렸으면 시스템 공유로 대체
+    setTimeout(async () => {
+      if (!appOpened) {
         closeShareModal();
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          closeShareModal();
-          copyLink();
+        if (navigator.share) {
+          try { await navigator.share(SHARE_DATA); } catch {}
+        } else {
+          await copyLink();
+          showToast('카카오톡이 없어 링크를 복사했어요 📋');
         }
       }
-    } else {
-      // 데스크탑 등 미지원 → 링크 복사 안내
-      closeShareModal();
-      copyLink();
-    }
+    }, 1500);
   }
 
   // ② 문자(SMS)로 보내기 — iOS · Android 모두 지원
   function shareSms() {
     const body = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
-    // iOS: sms:&body=  /  Android: sms:?body=  (둘 다 처리)
     window.location.href = `sms:?body=${body}`;
     closeShareModal();
   }
