@@ -537,6 +537,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      touch-action: none;
     }
 
     .lightbox.active {
@@ -1182,6 +1183,7 @@
 
   // 라이트박스 닫기
   function closeLightbox() {
+    if (window._resetLbZoom) window._resetLbZoom();
     document.getElementById('lightbox').classList.remove('active');
     document.body.style.overflow = '';
   }
@@ -1194,6 +1196,7 @@
 
   // 이미지 및 카운터 업데이트
   function renderLightbox() {
+    if (window._resetLbZoom) window._resetLbZoom();
     document.getElementById('lbImage').src = IMAGES[currentIdx];
     document.getElementById('lbCounter').textContent = `${currentIdx + 1} / ${IMAGES.length}`;
     // 도트 업데이트
@@ -1215,14 +1218,76 @@
     });
   }
 
-  // 스와이프로 이미지 넘기기
-  (function initSwipe() {
-    const lb = document.getElementById('lightbox');
-    let startX = 0;
-    lb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  // 스와이프 + 핀치 확대/축소
+  (function initGestures() {
+    const lb  = document.getElementById('lightbox');
+    const img = document.getElementById('lbImage');
+
+    let lbScale = 1, baseScale = 1, pinchDist0 = 0, isPinching = false;
+    let panX = 0, panY = 0, basePanX = 0, basePanY = 0;
+    let panStartX = 0, panStartY = 0, isPanning = false;
+    let swipeStartX = 0;
+
+    function applyTransform() {
+      img.style.transform = `translate(${panX}px,${panY}px) scale(${lbScale})`;
+    }
+
+    window._resetLbZoom = function() {
+      lbScale = 1; baseScale = 1;
+      panX = 0; panY = 0; basePanX = 0; basePanY = 0;
+      isPinching = false; isPanning = false;
+      img.style.transform = '';
+    };
+
+    function getTouchDist(t1, t2) {
+      return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+    }
+
+    lb.addEventListener('touchstart', e => {
+      if (e.touches.length === 2) {
+        isPinching = true; isPanning = false;
+        pinchDist0 = getTouchDist(e.touches[0], e.touches[1]);
+        baseScale = lbScale;
+        basePanX = panX; basePanY = panY;
+        e.preventDefault();
+      } else if (e.touches.length === 1) {
+        swipeStartX = e.touches[0].clientX;
+        if (lbScale > 1) {
+          isPanning = true;
+          panStartX = e.touches[0].clientX;
+          panStartY = e.touches[0].clientY;
+          basePanX = panX; basePanY = panY;
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    lb.addEventListener('touchmove', e => {
+      if (isPinching && e.touches.length === 2) {
+        const d = getTouchDist(e.touches[0], e.touches[1]);
+        lbScale = Math.min(Math.max(baseScale * (d / pinchDist0), 1), 4);
+        applyTransform();
+        e.preventDefault();
+      } else if (isPanning && e.touches.length === 1 && lbScale > 1) {
+        panX = basePanX + (e.touches[0].clientX - panStartX);
+        panY = basePanY + (e.touches[0].clientY - panStartY);
+        applyTransform();
+        e.preventDefault();
+      }
+    }, { passive: false });
+
     lb.addEventListener('touchend', e => {
-      const diff = startX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 50) moveLightbox(diff > 0 ? 1 : -1);
+      if (isPinching) {
+        isPinching = false;
+        if (lbScale < 1.1) window._resetLbZoom();
+        return;
+      }
+      if (isPanning) { isPanning = false; return; }
+      // 줌 상태에서는 스와이프 넘기기 비활성화
+      if (lbScale <= 1) {
+        const diff = swipeStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) moveLightbox(diff > 0 ? 1 : -1);
+      }
     }, { passive: true });
   })();
 
