@@ -221,6 +221,34 @@
       margin-bottom: 8px;
     }
 
+    /* 날짜 미니 캘린더 */
+    .cal-icon {
+      display: inline-flex;
+      flex-direction: column;
+      border: 2px solid #8B6F47;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 42px;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .cal-icon .cal-top {
+      background: #8B6F47;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 0;
+      letter-spacing: 1px;
+    }
+    .cal-icon .cal-day {
+      color: #2C1A0E;
+      font-size: 19px;
+      font-weight: 800;
+      padding: 2px 0;
+      line-height: 1.2;
+      background: #fff;
+    }
+
     .event-info-item .info-label {
       font-size: 12px;
       color: #8B6F47;
@@ -261,7 +289,8 @@
 
     .location-address .address-phone {
       font-size: 16px;
-      color: #8B6F47;
+      color: #1a1a1a;
+      font-weight: 600;
     }
 
     .location-address .address-phone a {
@@ -272,63 +301,50 @@
     /* 지도 영역 */
     .map-container {
       width: 100%;
+      height: 220px;
       border-radius: 16px;
       overflow: hidden;
       margin-bottom: 16px;
-      background: #e8f4ea;
+      background: #e8e0d5;
       position: relative;
     }
 
-    .map-naver-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 28px 20px 20px;
-      gap: 16px;
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
 
-    .map-naver-preview {
-      text-align: center;
-    }
-
-    .map-naver-flag {
-      font-size: 36px;
-      margin-bottom: 10px;
-    }
-
-    .map-naver-addr {
-      font-size: 14px;
-      color: #2C4A2C;
-      font-weight: 600;
-      line-height: 1.7;
-    }
-
-    .map-naver-link {
+    /* 지도 위 네이버지도 열기 버튼 */
+    .map-naver-overlay {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       background: #03C75A;
       color: #fff;
       text-decoration: none;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 700;
-      padding: 14px 28px;
-      border-radius: 10px;
+      padding: 7px 12px;
+      border-radius: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       transition: opacity 0.2s;
+      z-index: 10;
     }
 
-    .map-naver-link:active {
-      opacity: 0.8;
-    }
+    .map-naver-overlay:active { opacity: 0.8; }
 
     .map-naver-n {
       background: #fff;
       color: #03C75A;
-      font-size: 13px;
+      font-size: 10px;
       font-weight: 900;
-      width: 22px;
-      height: 22px;
-      border-radius: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -656,7 +672,7 @@
     .bgm-btn {
       position: fixed;
       top: 18px;
-      right: 18px;
+      left: 18px;
       width: 44px;
       height: 44px;
       border-radius: 50%;
@@ -694,7 +710,7 @@
       <div class="hero-main-title">
         세상에서 가장 소중한<br/>당신을 초대합니다
       </div>
-      <div class="hero-date">2026. 04. 19 (일)</div>
+      <div class="hero-date">2026. <strong>04. 19.</strong> (일)</div>
     </div>
   </div>
 
@@ -721,7 +737,7 @@
       </p>
       <p>
         어떤 종교, 참신(하나님)을 만나느냐에 따라<br/>
-        영원이 결정됩니다.
+        '영원'이 결정됩니다.
       </p>
       <p>
         예수님과의 만남은<br/>
@@ -731,7 +747,7 @@
     </div>
 
     <div class="invite-sign">
-      둔덕교회 담임목사 외 교우일동
+      둔덕교회 담임목사 외 교우 일동
     </div>
   </div>
 
@@ -740,7 +756,10 @@
     <div class="section-label">✦ 행사 정보 ✦</div>
     <div class="event-info-grid">
       <div class="event-info-item">
-        <div class="info-icon">📅</div>
+        <div class="cal-icon">
+          <div class="cal-top">APR</div>
+          <div class="cal-day">19</div>
+        </div>
         <div class="info-label">DATE</div>
         <div class="info-value">2026년<br/>4월 19일 (일)</div>
       </div>
@@ -758,6 +777,7 @@
         <div class="info-icon">📞</div>
         <div class="info-label">CONTACT</div>
         <div class="info-value">
+          손양우 담임목사<br/>
           <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
         </div>
       </div>
@@ -770,27 +790,23 @@
 
     <div class="location-address">
       <div class="address-main">
-        전북특별자치도 임실군<br/>오수면 둔덕1길 14-20
-      </div>
-      <div class="address-phone">
-        둔덕교회
+        전북특별자치도 임실군 오수면 둔덕1길 14-20, 둔덕교회
       </div>
     </div>
 
-    <!-- 네이버지도 -->
+    <!-- 지도: 구글맵 바로 표시 + 우측 하단 네이버지도 열기 버튼 -->
     <div class="map-container">
-      <div class="map-naver-box">
-        <div class="map-naver-preview">
-          <div class="map-naver-flag">📍</div>
-          <div class="map-naver-addr">전북특별자치도 임실군<br/>오수면 둔덕1길 14-20</div>
-        </div>
-        <a class="map-naver-link"
-           href="nmap://search?query=전북특별자치도 임실군 오수면 둔덕1길 14-20&appname=com.dunduk.church"
-           onclick="openNaverMapLink(event)">
-          <span class="map-naver-n">N</span>
-          네이버지도로 보기
-        </a>
-      </div>
+      <iframe
+        src="https://maps.google.com/maps?q=%EC%A0%84%EB%B6%81%ED%8A%B9%EB%B3%84%EC%9E%90%EC%B9%98%EB%8F%84+%EC%9E%84%EC%8B%A4%EA%B5%B0+%EC%98%A4%EC%88%98%EB%A9%B4+%EB%91%94%EB%8D%951%EA%B8%B8+14-20&output=embed&hl=ko&z=15"
+        title="둔덕교회 위치"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+      <a class="map-naver-overlay" onclick="openNaverMapLink(event)" href="#">
+        <span class="map-naver-n">N</span>
+        네이버지도로 보기
+      </a>
     </div>
 
     <!-- 내비게이션 버튼 (주소 기반) -->
@@ -857,7 +873,7 @@
     <div class="share-buttons">
       <button class="share-btn kakao" onclick="shareKakao()">
         <span class="btn-icon">💬</span>
-        <span>카카오톡 공유</span>
+        <span>공유하기</span>
       </button>
       <button class="share-btn link" onclick="copyLink()">
         <span class="btn-icon">🔗</span>
@@ -1034,21 +1050,24 @@
   /* ===================================================
      공유 기능
   =================================================== */
-  // Kakao.init('YOUR_KAKAO_APP_KEY'); // ← 카카오 앱 키 입력
 
-  function shareKakao() {
-    if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-      copyLink(); return;
+  // 카카오톡 공유: 모바일 기본 공유 시트 사용 (앱 키 불필요)
+  // → 공유 시트에서 카카오톡, 문자, 메일 등 직접 선택 가능
+  async function shareKakao() {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '둔덕교회 VIP 초청주일',
+          text: '세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일(2026. 4. 19)에 초대합니다.',
+          url: location.href,
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') copyLink();
+      }
+    } else {
+      // 데스크탑 등 공유 API 미지원 환경 → 링크 복사
+      copyLink();
     }
-    Kakao.Share.sendDefault({
-      objectType: 'feed',
-      content: {
-        title: '둔덕교회 VIP 초청주일',
-        description: '세상에서 가장 소중한 당신을 초대합니다 — 2025년 4월 19일',
-        link: { mobileWebUrl: location.href, webUrl: location.href },
-      },
-      buttons: [{ title: '초대장 보기', link: { mobileWebUrl: location.href, webUrl: location.href } }],
-    });
   }
 
   async function copyLink() {
