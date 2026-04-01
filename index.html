@@ -682,16 +682,45 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       z-index: 9000;
       transition: transform 0.15s, background 0.2s;
       backdrop-filter: blur(4px);
     }
 
-    .bgm-btn:active {
-      transform: scale(0.88);
+    .bgm-btn:active { transform: scale(0.88); }
+
+    /* CSS로 그린 아이콘 컨테이너 */
+    .bgm-icon {
+      position: relative;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* 재생(▶): 흰색 삼각형 */
+    .bgm-btn.stopped .bgm-icon::before {
+      content: '';
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 14px solid #fff;
+      margin-left: 3px;
+    }
+
+    /* 일시정지(⏸): 흰색 세로바 두 개 */
+    .bgm-btn.playing .bgm-icon::before,
+    .bgm-btn.playing .bgm-icon::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 16px;
+      background: #fff;
+      border-radius: 1px;
+    }
+    .bgm-btn.playing .bgm-icon::before { left: 1px; }
+    .bgm-btn.playing .bgm-icon::after  { right: 1px; }
   </style>
 </head>
 <body>
@@ -912,8 +941,8 @@
 <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 
 <!-- BGM 토글 버튼 -->
-<button class="bgm-btn" id="bgmBtn" onclick="toggleBgm()" title="BGM 켜기/끄기">
-  <span class="bgm-icon" style="color:#fff; font-size:16px; font-weight:700; letter-spacing:-1px;">⏸</span>
+<button class="bgm-btn stopped" id="bgmBtn" onclick="toggleBgm()" title="BGM 켜기/끄기">
+  <span class="bgm-icon"></span>
 </button>
 
 <!-- 토스트 메시지 -->
@@ -1102,46 +1131,45 @@
 
   /* ===================================================
      BGM 자동재생 + 토글
-     - 모바일은 첫 사용자 터치 이후에만 오디오 재생 가능 (브라우저 정책)
-     - 페이지 진입 즉시 재생 시도 → 실패 시 첫 터치에 재생
-     - 🔊 = 재생 중 (누르면 정지), 🔇 = 정지 중 (누르면 재생)
+     모바일 브라우저 정책: 반드시 사용자 인터랙션(터치·스크롤·클릭) 이후에만 재생 가능.
+     → 페이지 진입 후 스크롤·터치 등 첫 인터랙션 시 자동 시작.
+     → 버튼으로 언제든 일시정지/재생 가능.
   =================================================== */
   const bgm    = document.getElementById('bgm');
   const bgmBtn = document.getElementById('bgmBtn');
-  const bgmIcon = bgmBtn.querySelector('.bgm-icon');
+  let   unlocked = false;
 
-  function setIcon(playing) {
-    bgmIcon.textContent = playing ? '⏸' : '▶';
+  function setPlaying(on) {
+    bgmBtn.classList.toggle('playing', on);
+    bgmBtn.classList.toggle('stopped', !on);
   }
 
-  function playBgm() {
+  function startBgm() {
+    if (unlocked) return;
+    unlocked = true;
     bgm.volume = 0.45;
-    bgm.play().then(() => setIcon(true)).catch(() => setIcon(false));
+    bgm.play()
+      .then(() => setPlaying(true))
+      .catch(() => setPlaying(false));
   }
 
   function toggleBgm() {
+    if (!unlocked) {
+      // 버튼이 첫 인터랙션인 경우
+      startBgm();
+      return;
+    }
     if (bgm.paused) {
-      bgm.play().then(() => setIcon(true));
+      bgm.play().then(() => setPlaying(true));
     } else {
       bgm.pause();
-      setIcon(false);
+      setPlaying(false);
     }
   }
 
-  // 페이지 로드 즉시 재생 시도
-  window.addEventListener('load', () => {
-    bgm.volume = 0.45;
-    bgm.play().then(() => setIcon(true)).catch(() => {
-      // 자동재생 실패 → 첫 터치 시 재생
-      setIcon(false);
-      const resumeOnTouch = () => {
-        playBgm();
-        document.removeEventListener('touchstart', resumeOnTouch);
-        document.removeEventListener('click',      resumeOnTouch);
-      };
-      document.addEventListener('touchstart', resumeOnTouch, { passive: true });
-      document.addEventListener('click',      resumeOnTouch);
-    });
+  // 스크롤·터치·클릭 등 첫 인터랙션에서 자동 시작
+  ['touchstart', 'touchmove', 'scroll', 'click', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, startBgm, { once: true, passive: true });
   });
 </script>
 
