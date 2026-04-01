@@ -1328,6 +1328,7 @@
   Kakao.init('77edfcb9de29ac85a4cc2956da6e53d5');
 
   function shareToKakao() {
+    try {
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
@@ -1355,6 +1356,7 @@
         },
       ],
     });
+    } catch(e) { alert('카카오 공유 오류: ' + e.message); }
   }
 
   // ② 문자(SMS)로 보내기 — iOS · Android 모두 지원
