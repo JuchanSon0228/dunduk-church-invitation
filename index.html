@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta property="og:title" content="둔덕교회 VIP 초청주일" />
   <meta property="og:description" content="세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일에 초대합니다" />
+  <meta property="og:image" content="https://juchanson0228.github.io/dunduk-church-invitation/og-image.png" />
+  <meta property="og:image:width" content="600" />
+  <meta property="og:image:height" content="800" />
+  <meta property="og:url" content="https://juchanson0228.github.io/dunduk-church-invitation/" />
   <title>둔덕교회 VIP 초청주일 초대장</title>
 
   <!-- 카카오 SDK -->
@@ -925,8 +929,9 @@
       <div class="event-info-item">
         <div class="info-icon">📞</div>
         <div class="info-label">CONTACT</div>
-        <div class="info-value" style="font-size:13px; white-space:nowrap;">
-          손양우 담임목사 <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
+        <div class="info-value" style="font-size:15px;">
+          손양우 담임목사<br/>
+          <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
         </div>
       </div>
     </div>
@@ -1235,13 +1240,31 @@
   function openShareModal()  { document.getElementById('shareModal').classList.add('open'); }
   function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
 
-  // ① 카카오톡으로 공유 (Kakao Share Picker)
+  // ① 카카오톡으로 공유 (Kakao Share SDK)
   function shareToKakao() {
     closeShareModal();
-    window.open(
-      'https://sharer.kakao.com/picker/link?app_key=15a0809a476376258d2e1d91343d4746&short_key=e3e92a2c-aa3f-463d-af07-ad2464a91cea',
-      '_blank'
-    );
+    if (!Kakao.isInitialized()) Kakao.init('15a0809a476376258d2e1d91343d4746');
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: '둔덕교회 VIP 초청주일',
+        description: '2026년 4월 19일(일) 오전 11시 · 둔덕교회 본당\n세상에서 가장 소중한 당신을 초대합니다.',
+        imageUrl: 'https://juchanson0228.github.io/dunduk-church-invitation/og-image.png',
+        imageWidth: 600,
+        imageHeight: 800,
+        link: {
+          mobileWebUrl: 'https://juchanson0228.github.io/dunduk-church-invitation/',
+          webUrl: 'https://juchanson0228.github.io/dunduk-church-invitation/',
+        },
+      },
+      buttons: [{
+        title: '초대장 보기',
+        link: {
+          mobileWebUrl: 'https://juchanson0228.github.io/dunduk-church-invitation/',
+          webUrl: 'https://juchanson0228.github.io/dunduk-church-invitation/',
+        },
+      }],
+    });
   }
 
   // ② 문자(SMS)로 보내기 — iOS · Android 모두 지원
