@@ -272,18 +272,66 @@
     /* 지도 영역 */
     .map-container {
       width: 100%;
-      height: 200px;
       border-radius: 16px;
       overflow: hidden;
       margin-bottom: 16px;
-      background: #e8e0d5;
+      background: #e8f4ea;
       position: relative;
     }
 
-    .map-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .map-naver-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 20px 20px;
+      gap: 16px;
+    }
+
+    .map-naver-preview {
+      text-align: center;
+    }
+
+    .map-naver-flag {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .map-naver-addr {
+      font-size: 14px;
+      color: #2C4A2C;
+      font-weight: 600;
+      line-height: 1.7;
+    }
+
+    .map-naver-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #03C75A;
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 10px;
+      transition: opacity 0.2s;
+    }
+
+    .map-naver-link:active {
+      opacity: 0.8;
+    }
+
+    .map-naver-n {
+      background: #fff;
+      color: #03C75A;
+      font-size: 13px;
+      font-weight: 900;
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* 내비게이션 버튼들 */
@@ -710,7 +758,6 @@
         <div class="info-icon">📞</div>
         <div class="info-label">CONTACT</div>
         <div class="info-value">
-          손양우 담임목사<br/>
           <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
         </div>
       </div>
@@ -726,20 +773,24 @@
         전북특별자치도 임실군<br/>오수면 둔덕1길 14-20
       </div>
       <div class="address-phone">
-        <a href="tel:01036251282">📞 손양우 담임목사 · 010-3625-1282</a>
+        둔덕교회
       </div>
     </div>
 
-    <!-- 네이버 지도 임베드 -->
+    <!-- 네이버지도 -->
     <div class="map-container">
-      <iframe
-        src="https://maps.google.com/maps?q=35.7269,127.2647&output=embed&hl=ko"
-        style="border:none; width:100%; height:100%;"
-        title="둔덕교회 위치"
-        loading="lazy"
-        allowfullscreen
-        referrerpolicy="no-referrer-when-downgrade"
-      ></iframe>
+      <div class="map-naver-box">
+        <div class="map-naver-preview">
+          <div class="map-naver-flag">📍</div>
+          <div class="map-naver-addr">전북특별자치도 임실군<br/>오수면 둔덕1길 14-20</div>
+        </div>
+        <a class="map-naver-link"
+           href="nmap://search?query=전북특별자치도 임실군 오수면 둔덕1길 14-20&appname=com.dunduk.church"
+           onclick="openNaverMapLink(event)">
+          <span class="map-naver-n">N</span>
+          네이버지도로 보기
+        </a>
+      </div>
     </div>
 
     <!-- 내비게이션 버튼 (주소 기반) -->
@@ -820,7 +871,7 @@
     <div class="footer-church">둔덕교회</div>
     <div class="footer-info">
       전북특별자치도 임실군 오수면 둔덕1길 14-20<br/>
-      010-3625-1282
+      010-3625-1282 (손양우 담임목사)
     </div>
   </div>
 
@@ -846,7 +897,7 @@
 
 <!-- BGM 토글 버튼 -->
 <button class="bgm-btn" id="bgmBtn" onclick="toggleBgm()" title="BGM 켜기/끄기">
-  <span class="bgm-icon">🎵</span>
+  <span class="bgm-icon" style="color:#fff; font-size:16px; font-weight:700; letter-spacing:-1px;">⏸</span>
 </button>
 
 <!-- 토스트 메시지 -->
@@ -862,6 +913,14 @@
   const LNG       = 127.2647;
   const ADDR_ENC  = encodeURIComponent(ADDR);
   const PLACE_ENC = encodeURIComponent(PLACE);
+
+  function openNaverMapLink(e) {
+    e.preventDefault();
+    const deep = `nmap://search?query=${ADDR_ENC}&appname=com.dunduk.church`;
+    const web  = `https://map.naver.com/v5/search/${ADDR_ENC}`;
+    window.location.href = deep;
+    setTimeout(() => window.open(web, '_blank'), 1200);
+  }
 
   function openTmap() {
     // 티맵: 목적지 주소로 길찾기
@@ -1033,7 +1092,7 @@
   const bgmIcon = bgmBtn.querySelector('.bgm-icon');
 
   function setIcon(playing) {
-    bgmIcon.textContent = playing ? '🔊' : '🔇';
+    bgmIcon.textContent = playing ? '⏸' : '▶';
   }
 
   function playBgm() {
