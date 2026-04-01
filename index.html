@@ -1112,6 +1112,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  /* ?map=naver 파라미터 감지 → 네이버지도 자동 이동 */
+  if (new URLSearchParams(location.search).get('map') === 'naver') {
+    const q = encodeURIComponent('전북특별자치도 임실군 오수면 둔덕1길 14-20, 둔덕교회');
+    location.replace('https://map.naver.com/v5/search/' + q);
+  }
+
   /* ===================================================
      내비게이션 앱 열기 (주소 기반)
   =================================================== */
@@ -1349,8 +1355,8 @@
         {
           title: '위치 보기',
           link: {
-            mobileWebUrl: `https://map.naver.com/v5/search/${FULL_ENC}`,
-            webUrl: `https://map.naver.com/v5/search/${FULL_ENC}`,
+            mobileWebUrl: KAKAO_PAGE_URL + '?map=naver',
+            webUrl: KAKAO_PAGE_URL + '?map=naver',
           },
         },
       ],
