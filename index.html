@@ -651,16 +651,18 @@
 
     .share-btn {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 16px;
+      gap: 6px;
+      padding: 14px 8px;
       border-radius: 12px;
       border: none;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 13px;
       font-weight: 600;
       transition: all 0.2s;
+      text-align: center;
     }
 
     .share-btn:active {
@@ -948,7 +950,7 @@
       <div class="event-info-item">
         <div class="info-icon">📞</div>
         <div class="info-label">CONTACT</div>
-        <div class="info-value" style="font-size:15px;">
+        <div class="info-value" style="font-size:17px; white-space:nowrap;">
           손양우 담임목사<br/>
           <a href="tel:01036251282" style="color:#2C1A0E; text-decoration:none;">010-3625-1282</a>
         </div>
@@ -1256,6 +1258,7 @@
     let lbScale = 1, baseScale = 1, pinchDist0 = 0, isPinching = false;
     let panX = 0, panY = 0, basePanX = 0, basePanY = 0;
     let panStartX = 0, panStartY = 0, isPanning = false;
+    let justPinched = false;
     let swipeStartX = 0;
 
     function applyTransform() {
@@ -1309,6 +1312,7 @@
     lb.addEventListener('touchend', e => {
       if (isPinching) {
         isPinching = false;
+        justPinched = true;
         // 손을 떼면 항상 원래 크기로 부드럽게 복귀
         img.style.transition = 'transform 0.25s ease';
         window._resetLbZoom();
@@ -1316,6 +1320,8 @@
         return;
       }
       if (isPanning) { isPanning = false; return; }
+      // 핀치 직후 두 번째 touchend에서 스와이프 오인식 방지
+      if (justPinched) { justPinched = false; return; }
       // 줌 상태에서는 스와이프 넘기기 비활성화
       if (lbScale <= 1) {
         const diff = swipeStartX - e.changedTouches[0].clientX;
@@ -1355,6 +1361,13 @@
   const KAKAO_IMG_URL  = 'https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=3';
 
   Kakao.init('77edfcb9de29ac85a4cc2956da6e53d5');
+
+  // 카카오 공유 후 페이지가 이탈되는 경우 복귀
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted && location.href !== KAKAO_PAGE_URL) {
+      location.replace(KAKAO_PAGE_URL);
+    }
+  });
 
   function shareToKakao() {
     Kakao.Share.sendDefault({
