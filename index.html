@@ -95,37 +95,42 @@
     }
 
     .hero-cross {
-      font-size: 48px;
+      /* 소형폰 56px ↔ 대형폰 최대 80px */
+      font-size: clamp(56px, 14vw, 80px);
       color: #8B6F47;
-      margin-bottom: 20px;
+      margin-bottom: clamp(16px, 4vw, 28px);
       opacity: 0.7;
     }
 
     .hero-title-text {
-      font-size: 15px;
+      /* 소형폰 16px ↔ 대형폰 최대 22px */
+      font-size: clamp(16px, 4.2vw, 22px);
       letter-spacing: 4px;
       color: #8B6F47;
       font-weight: 500;
-      margin-bottom: 12px;
+      margin-bottom: clamp(10px, 2.5vw, 16px);
     }
 
     .hero-main-title {
-      font-size: 29px;
+      /* 소형폰 32px ↔ 대형폰 최대 46px */
+      font-size: clamp(32px, 8.5vw, 46px);
       color: #3D2B1F;
       font-weight: 700;
       line-height: 1.4;
     }
 
     .hero-date {
-      margin-top: 24px;
-      font-size: 18px;
+      margin-top: clamp(20px, 5vw, 32px);
+      /* 소형폰 19px ↔ 대형폰 최대 26px */
+      font-size: clamp(19px, 4.8vw, 26px);
       color: #8B6F47;
       font-weight: 500;
       letter-spacing: 2px;
     }
 
     .hero-date strong {
-      font-size: 21px;
+      /* 소형폰 23px ↔ 대형폰 최대 30px */
+      font-size: clamp(23px, 5.8vw, 30px);
     }
 
     /* 히어로 하단 스크롤 유도 화살표 */
@@ -749,8 +754,8 @@
 
     .share-modal-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
       margin-bottom: 16px;
     }
 
@@ -1061,17 +1066,15 @@
   <div class="share-modal-sheet">
     <div class="share-modal-title">초대장 공유하기</div>
     <div class="share-modal-grid">
-      <button class="share-modal-btn" onclick="shareKakaoApp()">
-        <span class="smi">💬</span>카카오톡
+      <button class="share-modal-btn" onclick="shareViaApps()">
+        <span class="smi">📤</span>
+        <span>앱으로 공유<br/><small style="font-weight:400;color:#888;">(카카오톡·인스타 등)</small></span>
       </button>
       <button class="share-modal-btn" onclick="shareSms()">
         <span class="smi">✉️</span>문자 보내기
       </button>
       <button class="share-modal-btn" onclick="copyLink(); closeShareModal();">
         <span class="smi">🔗</span>링크 복사
-      </button>
-      <button class="share-modal-btn" onclick="shareMore()">
-        <span class="smi">⋯</span>더 보기
       </button>
     </div>
     <button class="share-modal-cancel" onclick="closeShareModal()">닫기</button>
@@ -1218,58 +1221,52 @@
   });
 
   /* ===================================================
-     공유 기능 (iOS · Android 모두 지원)
+     공유 기능 (iOS · Android 공통)
+
+     ★ 카카오톡 채팅 목록 여는 유일한 방법:
+       navigator.share() → 시스템 공유 시트 → KakaoTalk 선택
+       → KakaoTalk가 자체 채팅 목록(친구/채팅방 피커)을 열어줌
+     ★ "앱 목록 보기" = navigator.share() = 기기의 모든 앱 공유 시트
   =================================================== */
   const SHARE_TEXT = '세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일(2026. 4. 19)에 초대합니다.';
   const SHARE_URL  = location.href;
+  const SHARE_DATA = { title: '둔덕교회 VIP 초청주일', text: SHARE_TEXT, url: SHARE_URL };
 
-  // 공유하기 메인 버튼
-  async function shareKakao() {
-    if (navigator.share) {
-      // iOS Safari · Android Chrome → 시스템 공유 시트 (카카오톡, 문자 등 선택 가능)
-      try {
-        await navigator.share({
-          title: '둔덕교회 VIP 초청주일',
-          text:  SHARE_TEXT,
-          url:   SHARE_URL,
-        });
-      } catch (err) {
-        // 사용자가 취소한 경우(AbortError)는 무시
-        if (err.name !== 'AbortError') openShareModal();
-      }
-    } else {
-      // 시스템 공유 API 미지원 (구형 Android, 데스크탑) → 직접 만든 바텀 시트
-      openShareModal();
-    }
-  }
+  // 메인 공유 버튼 → 항상 바텀 시트 열기 (명시적 선택 제공)
+  function shareKakao() { openShareModal(); }
 
   // 바텀 시트 열기 / 닫기
   function openShareModal()  { document.getElementById('shareModal').classList.add('open'); }
   function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
 
-  // 카카오톡 앱으로 직접 공유 (앱 설치 필요)
-  function shareKakaoApp() {
-    const msg = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
-    // Android 인텐트 → iOS 딥링크 순으로 시도
-    const kakaoUrl = `kakaotalk://msg/send?text=${msg}`;
-    window.location.href = kakaoUrl;
-    setTimeout(() => closeShareModal(), 500);
+  // ① 카카오톡 / 앱 목록 공유
+  //    navigator.share() = 시스템 공유 시트 = 기기에 설치된 모든 앱 표시
+  //    여기서 KakaoTalk 선택 → KakaoTalk 채팅 목록(피커) 자동 오픈
+  async function shareViaApps() {
+    // 모달을 먼저 닫지 않고 share() 호출 → 사용자 제스처 컨텍스트 유지
+    if (navigator.share) {
+      try {
+        await navigator.share(SHARE_DATA);
+        closeShareModal();
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          closeShareModal();
+          copyLink();
+        }
+      }
+    } else {
+      // 데스크탑 등 미지원 → 링크 복사 안내
+      closeShareModal();
+      copyLink();
+    }
   }
 
-  // 문자(SMS)로 보내기
+  // ② 문자(SMS)로 보내기 — iOS · Android 모두 지원
   function shareSms() {
     const body = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
+    // iOS: sms:&body=  /  Android: sms:?body=  (둘 다 처리)
     window.location.href = `sms:?body=${body}`;
     closeShareModal();
-  }
-
-  // 기타 앱 공유 (시스템 공유 시트 재시도)
-  async function shareMore() {
-    closeShareModal();
-    if (navigator.share) {
-      try { await navigator.share({ title: '둔덕교회 VIP 초청주일', text: SHARE_TEXT, url: SHARE_URL }); }
-      catch {}
-    }
   }
 
   async function copyLink() {
