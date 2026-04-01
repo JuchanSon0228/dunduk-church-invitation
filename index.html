@@ -73,7 +73,9 @@
       width: 100%;
       position: relative;
       background: linear-gradient(135deg, #f9f3ec 0%, #ede0d0 50%, #d4b896 100%);
-      min-height: 420px;
+      /* 기기별 풀스크린: svh = 브라우저 주소바 제외한 순수 화면 높이 */
+      height: 100vh;
+      height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -88,7 +90,8 @@
 
     .hero-placeholder {
       text-align: center;
-      padding: 60px 30px;
+      padding: 0 30px;
+      width: 100%;
     }
 
     .hero-cross {
@@ -123,6 +126,41 @@
 
     .hero-date strong {
       font-size: 21px;
+    }
+
+    /* 히어로 하단 스크롤 유도 화살표 */
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      opacity: 0.55;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    .hero-scroll-hint span {
+      font-size: 11px;
+      color: #8B6F47;
+      letter-spacing: 2px;
+      font-weight: 500;
+    }
+
+    .hero-scroll-hint::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-right: 2px solid #8B6F47;
+      border-bottom: 2px solid #8B6F47;
+      transform: rotate(45deg);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
     }
 
     /* ===== 초대 메시지 섹션 ===== */
@@ -672,6 +710,79 @@
       user-drag: none;
     }
 
+    /* ===== 공유 바텀 시트 (navigator.share 미지원 환경용) ===== */
+    .share-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9500;
+    }
+
+    .share-modal.open { display: block; }
+
+    .share-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+    }
+
+    .share-modal-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 24px 40px;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    }
+
+    .share-modal-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2C1A0E;
+      margin-bottom: 20px;
+    }
+
+    .share-modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .share-modal-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 18px 12px;
+      border-radius: 14px;
+      border: 1.5px solid #e0d5c8;
+      background: #faf6f0;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3D2B1F;
+    }
+
+    .share-modal-btn .smi { font-size: 26px; }
+
+    .share-modal-cancel {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      background: #f0ebe4;
+      font-size: 15px;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+    }
+
     /* ===== BGM 토글 버튼 ===== */
     .bgm-btn {
       position: fixed;
@@ -744,6 +855,9 @@
         세상에서 가장 소중한<br/>당신을 초대합니다
       </div>
       <div class="hero-date">2026. <strong>04. 19.</strong> (일)</div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>SCROLL</span>
     </div>
   </div>
 
@@ -941,6 +1055,29 @@
   <div class="lightbox-dots" id="lbDots"></div>
 </div>
 
+<!-- 공유 바텀 시트 -->
+<div class="share-modal" id="shareModal">
+  <div class="share-modal-backdrop" onclick="closeShareModal()"></div>
+  <div class="share-modal-sheet">
+    <div class="share-modal-title">초대장 공유하기</div>
+    <div class="share-modal-grid">
+      <button class="share-modal-btn" onclick="shareKakaoApp()">
+        <span class="smi">💬</span>카카오톡
+      </button>
+      <button class="share-modal-btn" onclick="shareSms()">
+        <span class="smi">✉️</span>문자 보내기
+      </button>
+      <button class="share-modal-btn" onclick="copyLink(); closeShareModal();">
+        <span class="smi">🔗</span>링크 복사
+      </button>
+      <button class="share-modal-btn" onclick="shareMore()">
+        <span class="smi">⋯</span>더 보기
+      </button>
+    </div>
+    <button class="share-modal-cancel" onclick="closeShareModal()">닫기</button>
+  </div>
+</div>
+
 <!-- BGM -->
 <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 
@@ -1081,25 +1218,57 @@
   });
 
   /* ===================================================
-     공유 기능
+     공유 기능 (iOS · Android 모두 지원)
   =================================================== */
+  const SHARE_TEXT = '세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일(2026. 4. 19)에 초대합니다.';
+  const SHARE_URL  = location.href;
 
-  // 카카오톡 공유: 모바일 기본 공유 시트 사용 (앱 키 불필요)
-  // → 공유 시트에서 카카오톡, 문자, 메일 등 직접 선택 가능
+  // 공유하기 메인 버튼
   async function shareKakao() {
     if (navigator.share) {
+      // iOS Safari · Android Chrome → 시스템 공유 시트 (카카오톡, 문자 등 선택 가능)
       try {
         await navigator.share({
           title: '둔덕교회 VIP 초청주일',
-          text: '세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일(2026. 4. 19)에 초대합니다.',
-          url: location.href,
+          text:  SHARE_TEXT,
+          url:   SHARE_URL,
         });
       } catch (err) {
-        if (err.name !== 'AbortError') copyLink();
+        // 사용자가 취소한 경우(AbortError)는 무시
+        if (err.name !== 'AbortError') openShareModal();
       }
     } else {
-      // 데스크탑 등 공유 API 미지원 환경 → 링크 복사
-      copyLink();
+      // 시스템 공유 API 미지원 (구형 Android, 데스크탑) → 직접 만든 바텀 시트
+      openShareModal();
+    }
+  }
+
+  // 바텀 시트 열기 / 닫기
+  function openShareModal()  { document.getElementById('shareModal').classList.add('open'); }
+  function closeShareModal() { document.getElementById('shareModal').classList.remove('open'); }
+
+  // 카카오톡 앱으로 직접 공유 (앱 설치 필요)
+  function shareKakaoApp() {
+    const msg = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
+    // Android 인텐트 → iOS 딥링크 순으로 시도
+    const kakaoUrl = `kakaotalk://msg/send?text=${msg}`;
+    window.location.href = kakaoUrl;
+    setTimeout(() => closeShareModal(), 500);
+  }
+
+  // 문자(SMS)로 보내기
+  function shareSms() {
+    const body = encodeURIComponent(SHARE_TEXT + '\n' + SHARE_URL);
+    window.location.href = `sms:?body=${body}`;
+    closeShareModal();
+  }
+
+  // 기타 앱 공유 (시스템 공유 시트 재시도)
+  async function shareMore() {
+    closeShareModal();
+    if (navigator.share) {
+      try { await navigator.share({ title: '둔덕교회 VIP 초청주일', text: SHARE_TEXT, url: SHARE_URL }); }
+      catch {}
     }
   }
 
