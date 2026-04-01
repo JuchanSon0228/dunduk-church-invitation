@@ -121,6 +121,10 @@
       letter-spacing: 2px;
     }
 
+    .hero-date strong {
+      font-size: 21px;
+    }
+
     /* ===== 초대 메시지 섹션 ===== */
     .invite-section {
       padding: 50px 32px 40px;
@@ -1131,9 +1135,10 @@
 
   /* ===================================================
      BGM 자동재생 + 토글
-     모바일 브라우저 정책: 반드시 사용자 인터랙션(터치·스크롤·클릭) 이후에만 재생 가능.
-     → 페이지 진입 후 스크롤·터치 등 첫 인터랙션 시 자동 시작.
-     → 버튼으로 언제든 일시정지/재생 가능.
+     목표: 링크 접속 즉시 재생.
+     - 브라우저가 허용하면 → 페이지 로드와 동시에 재생 시작
+     - iOS/Android가 차단하면 → 첫 터치(화면 탭) 즉시 재생
+       (스크롤 등 추가 동작 필요 없음)
   =================================================== */
   const bgm    = document.getElementById('bgm');
   const bgmBtn = document.getElementById('bgmBtn');
@@ -1144,19 +1149,22 @@
     bgmBtn.classList.toggle('stopped', !on);
   }
 
-  function startBgm() {
+  function tryPlay() {
     if (unlocked) return;
     unlocked = true;
     bgm.volume = 0.45;
     bgm.play()
       .then(() => setPlaying(true))
-      .catch(() => setPlaying(false));
+      .catch(() => {
+        // 재생 차단됨 → 잠금 다시 열어두기
+        unlocked = false;
+        setPlaying(false);
+      });
   }
 
   function toggleBgm() {
     if (!unlocked) {
-      // 버튼이 첫 인터랙션인 경우
-      startBgm();
+      tryPlay();
       return;
     }
     if (bgm.paused) {
@@ -1167,10 +1175,13 @@
     }
   }
 
-  // 스크롤·터치·클릭 등 첫 인터랙션에서 자동 시작
-  ['touchstart', 'touchmove', 'scroll', 'click', 'keydown'].forEach(evt => {
-    document.addEventListener(evt, startBgm, { once: true, passive: true });
-  });
+  // 1) 페이지 로드 즉시 재생 시도 (PC·일부 Android에서 성공)
+  tryPlay();
+
+  // 2) 실패 시 첫 터치에서 재생 (iOS Safari 등)
+  //    touchstart: 화면에 손가락 닿는 순간 → 스크롤 불필요
+  document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+  document.addEventListener('click',      tryPlay, { once: true });
 </script>
 
 </body>
