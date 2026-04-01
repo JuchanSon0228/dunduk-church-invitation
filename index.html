@@ -645,7 +645,7 @@
 
     .share-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
     }
 
@@ -1058,7 +1058,11 @@
   <div class="share-section">
     <div class="section-label" style="text-align:center; margin-bottom:16px;">✦ 초대장 공유하기 ✦</div>
     <div class="share-buttons">
-      <button class="share-btn kakao" onclick="shareSms()">
+      <button class="share-btn kakao" onclick="shareToKakao()">
+        <span class="btn-icon">💬</span>
+        <span>카카오 공유</span>
+      </button>
+      <button class="share-btn link" onclick="shareSms()">
         <span class="btn-icon">✉️</span>
         <span>문자 공유</span>
       </button>
@@ -1322,7 +1326,6 @@
   const KAKAO_IMG_URL  = 'https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=3';
 
   function shareToKakao() {
-    closeShareModal();
     if (!Kakao.isInitialized()) Kakao.init('77edfcb9de29ac85a4cc2956da6e53d5');
     Kakao.Share.sendDefault({
       objectType: 'feed',
