@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta property="og:title" content="둔덕교회 VIP 초청주일" />
   <meta property="og:description" content="세상에서 가장 소중한 당신을, 둔덕교회 VIP 초청주일에 초대합니다" />
-  <meta property="og:image" content="https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=2" />
+  <meta property="og:image" content="https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=3" />
   <meta property="og:image:width" content="600" />
   <meta property="og:image:height" content="800" />
   <meta property="og:url" content="https://juchanson0228.github.io/dunduk-church-invitation/" />
@@ -1057,13 +1057,13 @@
   <div class="share-section">
     <div class="section-label" style="text-align:center; margin-bottom:16px;">✦ 초대장 공유하기 ✦</div>
     <div class="share-buttons">
-      <button class="share-btn kakao" onclick="shareToKakao()">
-        <span class="btn-icon">💬</span>
-        <span>카카오 공유</span>
-      </button>
-      <button class="share-btn link" onclick="shareSms()">
+      <button class="share-btn kakao" onclick="shareSms()">
         <span class="btn-icon">✉️</span>
         <span>문자 공유</span>
+      </button>
+      <button class="share-btn link" onclick="copyLink()">
+        <span class="btn-icon">🔗</span>
+        <span>링크 복사</span>
       </button>
     </div>
   </div>
@@ -1254,7 +1254,7 @@
 
   // ① 카카오톡으로 공유 (Kakao Share SDK)
   const KAKAO_PAGE_URL = 'https://juchanson0228.github.io/dunduk-church-invitation/';
-  const KAKAO_IMG_URL  = 'https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=2';
+  const KAKAO_IMG_URL  = 'https://juchanson0228.github.io/dunduk-church-invitation/og-image.png?v=3';
 
   function shareToKakao() {
     closeShareModal();
