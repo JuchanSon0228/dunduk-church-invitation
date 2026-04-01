@@ -1125,8 +1125,8 @@
   }
 
   function openTmap() {
-    // 티맵: 주소 기반 목적지 설정
-    const deep = `tmap://route?goalname=${PLACE_ENC}&goaladdr=${ADDR_ENC}`;
+    // 티맵: 주소 검색으로 목적지 찾기
+    const deep = `tmap://search?name=${FULL_ENC}`;
     const web  = `https://tmap.life/search?keyword=${FULL_ENC}`;
     tryDeepLink(deep, web);
   }
