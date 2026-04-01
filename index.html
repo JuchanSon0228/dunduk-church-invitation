@@ -687,7 +687,19 @@
     }
 
     .share-btn .btn-icon {
-      font-size: 18px;
+      font-size: 24px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 28px;
+    }
+
+    .share-btn .btn-icon img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      border-radius: 6px;
     }
 
     /* ===== 푸터 ===== */
@@ -1068,20 +1080,7 @@
     <div class="share-buttons">
       <button class="share-btn kakao" onclick="shareToKakao()">
         <span class="btn-icon">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- 노란 원형 배경 -->
-            <circle cx="14" cy="14" r="13" fill="#FEE500"/>
-            <!-- 카카오 말풍선 몸통 -->
-            <ellipse cx="14" cy="13" rx="8.5" ry="7" fill="#3C1E1E"/>
-            <!-- 말풍선 꼬리 -->
-            <path d="M11 19 L10 22.5 L14 20" fill="#3C1E1E"/>
-            <!-- 왼쪽 눈 -->
-            <circle cx="11" cy="12.5" r="1.3" fill="#FEE500"/>
-            <!-- 오른쪽 눈 -->
-            <circle cx="17" cy="12.5" r="1.3" fill="#FEE500"/>
-            <!-- 입 (웃는 곡선) -->
-            <path d="M11 15 Q14 17.2 17 15" stroke="#FEE500" stroke-width="1.3" stroke-linecap="round" fill="none"/>
-          </svg>
+          <img src="kakao.jpeg" alt="카카오톡" />
         </span>
         <span>카카오<br>공유</span>
       </button>
@@ -1454,45 +1453,42 @@
   =================================================== */
   const bgm    = document.getElementById('bgm');
   const bgmBtn = document.getElementById('bgmBtn');
-  let   unlocked = false;
 
   function setPlaying(on) {
     bgmBtn.classList.toggle('playing', on);
     bgmBtn.classList.toggle('stopped', !on);
   }
 
-  function tryPlay() {
-    if (unlocked) return;
-    unlocked = true;
+  function startBgm() {
+    if (!bgm.paused) return;
     bgm.volume = 0.45;
-    bgm.play()
-      .then(() => setPlaying(true))
-      .catch(() => {
-        // 재생 차단됨 → 잠금 다시 열어두기
-        unlocked = false;
-        setPlaying(false);
-      });
+    bgm.muted = false;
+    bgm.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
   }
 
   function toggleBgm() {
-    if (!unlocked) {
-      tryPlay();
-      return;
-    }
     if (bgm.paused) {
-      bgm.play().then(() => setPlaying(true));
+      bgm.muted = false;
+      bgm.play().then(() => setPlaying(true)).catch(() => {});
     } else {
       bgm.pause();
       setPlaying(false);
     }
   }
 
-  // 1) 페이지 로드 즉시 재생 시도 (PC·일부 Android에서 성공)
-  tryPlay();
-
-  // 2) 실패 시 첫 터치에서 재생 (iOS Safari 등)
-  //    touchstart 만 사용 - click 리스너는 공유 등 다른 기능의 사용자 제스처 권한을 빼앗을 수 있음
-  document.addEventListener('touchstart', tryPlay, { once: true, passive: true });
+  // 1) muted 상태로 즉시 재생 시도 → 성공하면 바로 unmute
+  //    (대부분 브라우저는 muted autoplay 허용 → 그 즉시 unmute하면 소리 남)
+  bgm.muted = true;
+  bgm.volume = 0.45;
+  bgm.play().then(() => {
+    bgm.muted = false;
+    setPlaying(true);
+  }).catch(() => {
+    // muted 재생도 차단된 경우 → 첫 터치 때 재생
+    bgm.muted = false;
+    setPlaying(false);
+    document.addEventListener('touchstart', startBgm, { once: true, passive: true });
+  });
 </script>
 
 </body>
