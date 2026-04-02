@@ -1266,11 +1266,24 @@
     let lbScale = 1, baseScale = 1, pinchDist0 = 0, isPinching = false;
     let panX = 0, panY = 0, basePanX = 0, basePanY = 0;
     let panStartX = 0, panStartY = 0, isPanning = false;
+    let pinchMidX0 = 0, pinchMidY0 = 0;
     let justPinched = false;
     let swipeStartX = 0;
+    let lastTapTime = 0;
 
     function applyTransform() {
       img.style.transform = `translate(${panX}px,${panY}px) scale(${lbScale})`;
+    }
+
+    function clampPan() {
+      const W = lb.clientWidth;
+      const H = lb.clientHeight;
+      const iW = img.offsetWidth;
+      const iH = img.offsetHeight;
+      const maxX = Math.max(0, (iW * lbScale - W) / 2);
+      const maxY = Math.max(0, (iH * lbScale - H) / 2);
+      panX = Math.max(-maxX, Math.min(maxX, panX));
+      panY = Math.max(-maxY, Math.min(maxY, panY));
     }
 
     window._resetLbZoom = function() {
@@ -1284,10 +1297,16 @@
       return Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
     }
 
+    function getTouchMid(t1, t2) {
+      return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 };
+    }
+
     lb.addEventListener('touchstart', e => {
       if (e.touches.length === 2) {
         isPinching = true; isPanning = false;
         pinchDist0 = getTouchDist(e.touches[0], e.touches[1]);
+        const mid = getTouchMid(e.touches[0], e.touches[1]);
+        pinchMidX0 = mid.x; pinchMidY0 = mid.y;
         baseScale = lbScale;
         basePanX = panX; basePanY = panY;
         e.preventDefault();
@@ -1299,6 +1318,15 @@
           panStartY = e.touches[0].clientY;
           basePanX = panX; basePanY = panY;
           e.preventDefault();
+        } else {
+          // 더블탭으로 줌 초기화
+          const now = Date.now();
+          if (now - lastTapTime < 300) {
+            img.style.transition = 'transform 0.25s ease';
+            window._resetLbZoom();
+            setTimeout(() => { img.style.transition = ''; }, 260);
+          }
+          lastTapTime = now;
         }
       }
     }, { passive: false });
@@ -1306,12 +1334,21 @@
     lb.addEventListener('touchmove', e => {
       if (isPinching && e.touches.length === 2) {
         const d = getTouchDist(e.touches[0], e.touches[1]);
-        lbScale = Math.min(Math.max(baseScale * (d / pinchDist0), 1), 4);
+        const newScale = Math.min(Math.max(baseScale * (d / pinchDist0), 1), 4);
+        const mid = getTouchMid(e.touches[0], e.touches[1]);
+        const W = lb.clientWidth;
+        const H = lb.clientHeight;
+        // 핀치 중심점 아래의 이미지 지점이 고정되도록 pan 계산
+        panX = mid.x - W / 2 - (pinchMidX0 - W / 2 - basePanX) * (newScale / baseScale);
+        panY = mid.y - H / 2 - (pinchMidY0 - H / 2 - basePanY) * (newScale / baseScale);
+        lbScale = newScale;
+        clampPan();
         applyTransform();
         e.preventDefault();
       } else if (isPanning && e.touches.length === 1 && lbScale > 1) {
         panX = basePanX + (e.touches[0].clientX - panStartX);
         panY = basePanY + (e.touches[0].clientY - panStartY);
+        clampPan();
         applyTransform();
         e.preventDefault();
       }
@@ -1321,10 +1358,12 @@
       if (isPinching) {
         isPinching = false;
         justPinched = true;
-        // 손을 떼면 항상 원래 크기로 부드럽게 복귀
-        img.style.transition = 'transform 0.25s ease';
-        window._resetLbZoom();
-        setTimeout(() => { img.style.transition = ''; }, 260);
+        // 줌이 1 이하로 내려가면 원래 크기로 부드럽게 복귀
+        if (lbScale <= 1) {
+          img.style.transition = 'transform 0.25s ease';
+          window._resetLbZoom();
+          setTimeout(() => { img.style.transition = ''; }, 260);
+        }
         return;
       }
       if (isPanning) { isPanning = false; return; }
