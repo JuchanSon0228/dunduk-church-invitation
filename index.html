@@ -1269,7 +1269,6 @@
     let pinchMidX0 = 0, pinchMidY0 = 0;
     let justPinched = false;
     let swipeStartX = 0;
-    let lastTapTime = 0;
 
     function applyTransform() {
       img.style.transform = `translate(${panX}px,${panY}px) scale(${lbScale})`;
@@ -1318,15 +1317,6 @@
           panStartY = e.touches[0].clientY;
           basePanX = panX; basePanY = panY;
           e.preventDefault();
-        } else {
-          // 더블탭으로 줌 초기화
-          const now = Date.now();
-          if (now - lastTapTime < 300) {
-            img.style.transition = 'transform 0.25s ease';
-            window._resetLbZoom();
-            setTimeout(() => { img.style.transition = ''; }, 260);
-          }
-          lastTapTime = now;
         }
       }
     }, { passive: false });
@@ -1358,12 +1348,10 @@
       if (isPinching) {
         isPinching = false;
         justPinched = true;
-        // 줌이 1 이하로 내려가면 원래 크기로 부드럽게 복귀
-        if (lbScale <= 1) {
-          img.style.transition = 'transform 0.25s ease';
-          window._resetLbZoom();
-          setTimeout(() => { img.style.transition = ''; }, 260);
-        }
+        // 손을 떼면 항상 원래 크기로 부드럽게 복귀
+        img.style.transition = 'transform 0.25s ease';
+        window._resetLbZoom();
+        setTimeout(() => { img.style.transition = ''; }, 260);
         return;
       }
       if (isPanning) { isPanning = false; return; }
