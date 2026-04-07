@@ -721,6 +721,61 @@
       line-height: 1.8;
     }
 
+    /* ===== 방문자 카운터 ===== */
+    .visitor-counter {
+      padding: 8px 32px 36px;
+      text-align: center;
+    }
+
+    .visitor-counter-box {
+      display: inline-flex;
+      flex-direction: row;
+      border: 1px solid #e8e0d6;
+      border-radius: 8px;
+      overflow: hidden;
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    }
+
+    .vc-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 20px;
+      background: #faf8f5;
+    }
+
+    .vc-item + .vc-item {
+      border-left: 1px solid #e8e0d6;
+    }
+
+    /* 캘린더 아이콘 (📅 스타일 SVG, 날짜 동적 표시) */
+    .vc-cal-svg {
+      width: 24px;
+      height: 26px;
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .vc-icon {
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .vc-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #b0a090;
+      letter-spacing: 0.07em;
+    }
+
+    .vc-count {
+      font-size: 15px;
+      font-weight: 700;
+      color: #C2A46E;
+      letter-spacing: 0.02em;
+    }
+
     /* ===== 토스트 메시지 ===== */
     .toast {
       position: fixed;
@@ -1104,6 +1159,33 @@
     </div>
   </div>
 
+  <!-- ===== 방문자 카운터 ===== -->
+  <div class="visitor-counter">
+    <div class="visitor-counter-box">
+      <div class="vc-item">
+        <svg class="vc-cal-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <!-- 캘린더 몸통 -->
+          <rect x="2" y="4" width="20" height="18" rx="3" fill="white" stroke="#d0b08a" stroke-width="1.5"/>
+          <!-- 빨간 헤더 -->
+          <rect x="2" y="4" width="20" height="7" rx="3" fill="#cc4444"/>
+          <rect x="2" y="8" width="20" height="3" fill="#cc4444"/>
+          <!-- 바인딩 링 2개 -->
+          <rect x="7" y="2" width="2.5" height="5" rx="1.2" fill="#888"/>
+          <rect x="14.5" y="2" width="2.5" height="5" rx="1.2" fill="#888"/>
+          <!-- 날짜 숫자 -->
+          <text id="vc-date-icon" x="12" y="20" text-anchor="middle" font-size="10" font-weight="800" fill="#222" font-family="Arial, sans-serif">-</text>
+        </svg>
+        <span class="vc-title">TODAY</span>
+        <span class="vc-count" id="vc-today">-</span>
+      </div>
+      <div class="vc-item">
+        <span class="vc-icon">👥</span>
+        <span class="vc-title">TOTAL</span>
+        <span class="vc-count" id="vc-total">-</span>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /container -->
 
 <!-- ===== 라이트박스 (전체화면 뷰어) ===== -->
@@ -1134,6 +1216,36 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  /* ===== 방문자 카운터 (counterapi.dev — CORS 지원) ===== */
+  (function () {
+    const NS = 'juchanson0228-dunduk';
+    const TOTAL_OFFSET = 40;
+
+    // 한국 시간(KST) 기준으로 날짜 계산
+    var koFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+    var koParts = koFormatter.formatToParts(new Date());
+    var koDate = { year: '', month: '', day: '' };
+    koParts.forEach(function(p) { if (p.type !== 'literal') koDate[p.type] = p.value; });
+    var todayKey = koDate.year + '-' + koDate.month + '-' + koDate.day; // "2026-04-07" (KST)
+    var koDay = parseInt(koDate.day, 10); // 7
+
+    // 날짜 배지에 한국 날짜(일) 표시
+    document.getElementById('vc-date-icon').textContent = koDay;
+
+    Promise.all([
+      fetch('https://api.counterapi.dev/v1/' + NS + '/total/up').then(r => r.json()),
+      fetch('https://api.counterapi.dev/v1/' + NS + '/' + todayKey + '/up').then(r => r.json())
+    ]).then(function(results) {
+      var total = results[0];
+      var today = results[1];
+      document.getElementById('vc-total').textContent = (total.count + TOTAL_OFFSET).toLocaleString();
+      document.getElementById('vc-today').textContent = today.count.toLocaleString();
+    }).catch(function() {
+      document.getElementById('vc-total').textContent = '--';
+      document.getElementById('vc-today').textContent = '--';
+    });
+  })();
+
   /* ?map=naver 파라미터 감지 → 네이버지도 자동 이동 */
   if (new URLSearchParams(location.search).get('map') === 'naver') {
     const q = encodeURIComponent('전북특별자치도 임실군 오수면 둔덕1길 14-20, 둔덕교회');
